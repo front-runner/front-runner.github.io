@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        #parent {
+            margin: 100px auto 0 auto; width: 600px; height: 300px; border: 1px solid #ccc; position: relative;
+        }
+
+        #child {
+            margin: 0 0 0 300px; width: 300px; height: 300px; border: 1px solid #ccc; position: relative;
+        }
+
+        .log {
+            position: absolute; left: 0; width: 100%; height: 100%; overflow: auto;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        #btns {
+            margin: 20px auto 0 auto; width: 600px;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-1.12.4.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous">
+    </script>
+</head>
+<body>
+<p>主要演示说明Jquery事件命名空间机制和基于命名空间的事件冒泡</p>
+<p>1.Jquery自定义事件命名空间带有匹配功能，侦听事件时会从前向后依次匹配</p>
+<p>2.浏览器原生事件不会带有命名空间，所以会最大化匹配</p>
+<p>3.Jquery自定义事件也具有冒泡功能</p>
+<p>4.Jquery自定义事件时，事件名称尽可能要与浏览器原生事件有所区别</p>
+<div id="parent">
+    <div class="log"></div>
+    <div id="child" onclick="//alert('click')" >
+        <div class="log"></div>
+    </div>
+</div>
+<div id="btns">
+    <button id="btn1"  type="button">向上匹配</button>
+    <button id="btn2" type="button">可以冒泡</button>
+    <button id="btn3" type="button">阻止冒泡&&事件转换</button>
+</div>
+<script language="JavaScript">
+    function log($e, msg) {
+        var $log = $e.children('.log');
+        $log.append('<p>' + msg + '</p>');
+    }
+
+    function init($p,$c) {
+        $('#btn1').on('click',function (e) {
+            $p.trigger('click')
+        })
+        $('#btn2').on('click',function (e) {
+            $c.trigger('click.n1')
+        })
+        $('#btn3').on('click',function (e) {
+            $c.trigger('click')
+        })
+
+        $p.on('click', function(e){
+            log($p, 'click');
+        });
+        $p.on('click.n1.n2', function(e){
+            log($p, 'click n1 n2');
+        });
+        $p.on('click.n1', function(e){
+            log($p, 'click n1');
+        });
+
+
+        $c.on('click1.n1.n2', function(e){
+            log($c, 'click1.n1.n2');
+        });
+        $c.on('click.n1.n2', function(e){
+            log($c, 'click n1 n2');
+        });
+        $c.on('click.n1', function(e){
+            log($c, 'click n1');
+        });
+        $c.on('click', function(e){
+            log($c, 'click')
+            e.stopPropagation()
+            $c.trigger('click1.n1.n2')
+        });
+
+    }
+
+    $(function(){
+        p = $('#parent')
+        c = $('#child')
+        init(p,c)
+        //alert('ok')
+    })
+</script>
+</body>
+</html>
